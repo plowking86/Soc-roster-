@@ -1,9 +1,0 @@
-{
-  "name": "Jess Roster",
-  "short_name": "Jess Roster",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#f7f7fb",
-  "theme_color": "#7c3aed",
-  "description": "Jess roster app"
-}
