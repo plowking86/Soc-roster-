@@ -1,37 +1,24 @@
 # Jessica Mazza Roster App
 
-GitHub Pages ready roster app generated from `DLRSOC.xlsm` for **Jessica Mazza**.
+GitHub Pages ready roster app generated from `DLRSOCJESS1.xlsx`.
 
-## Files
+## Included
 
-- `index.html` - the app
-- `data.js` - embedded roster and TIL data
-- `manifest.webmanifest` and `sw.js` - installable phone app support
-- `.nojekyll` - keeps GitHub Pages simple
+- Jessica Mazza roster only
+- Month calendar
+- Search/list view
+- Shift colour coding
+- Shift statistics
+- Local swap/note tracking saved in the browser
+- PWA install support for phone home screen
 
-## Upload to GitHub
+## Deploy on GitHub Pages
 
-1. Create a new GitHub repository, for example `jessica-mazza-roster`.
-2. Upload all files from this folder into the repository root.
+1. Create a new GitHub repository.
+2. Upload all files in this folder.
 3. Go to **Settings → Pages**.
 4. Source: **Deploy from a branch**.
-5. Branch: **main** and folder **/ root**.
-6. Save.
+5. Branch: **main** and folder: **/** root.
+6. Save and wait for the Pages link.
 
-Your app URL will look like:
-
-`https://YOUR-USERNAME.github.io/jessica-mazza-roster/`
-
-## App features
-
-- Month view
-- Week view
-- Search/list view
-- Shift colours
-- Shift stats
-- Local swap / note tracking
-- TIL entries for Jessica
-- Installable on iPhone/Android through browser Add to Home Screen
-
-Roster entries: 294  
-TIL entries: 0
+Roster range: 2025-06-29 to 2026-04-18 (294 entries).
