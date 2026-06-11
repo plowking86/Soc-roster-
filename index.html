@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <title>Jessica Mazza Roster</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <style>
+    :root{--bg:#0b1220;--card:#121a2b;--muted:#8ea0bd;--text:#f6f7fb;--line:#24314a;--accent:#7dd3fc;--off:#1f2937;--early:#22c55e;--day:#38bdf8;--night:#a78bfa;--leave:#fb7185;--other:#fbbf24}
+    *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1220,#111827);color:var(--text)}
+    header{position:sticky;top:0;z-index:5;padding:14px 16px;background:rgba(11,18,32,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    h1{font-size:22px;margin:0}.sub{color:var(--muted);font-size:13px;margin-top:3px}.wrap{max-width:1100px;margin:0 auto;padding:14px}.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+    button,input,select,textarea{border:1px solid var(--line);background:#0f172a;color:var(--text);border-radius:12px;padding:10px 12px;font-size:15px}button{cursor:pointer}button.primary{background:#0ea5e9;border-color:#0ea5e9;color:white}button.danger{background:#7f1d1d;border-color:#991b1b}.grow{flex:1;min-width:180px}
+    .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.dow{color:var(--muted);font-size:12px;text-align:center;padding:6px}.cell{min-height:92px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px;position:relative}.date{font-weight:700;font-size:14px}.shift{margin-top:8px;font-size:18px;font-weight:800}.small{font-size:12px;color:var(--muted)}.dim{opacity:.45}.today{outline:2px solid var(--accent)}
+    .cat-off{border-color:#374151}.cat-early{border-color:var(--early)}.cat-day{border-color:var(--day)}.cat-night{border-color:var(--night)}.cat-leave{border-color:var(--leave)}.cat-other{border-color:var(--other)}
+    .tag{display:inline-block;margin-top:6px;border-radius:999px;padding:3px 8px;font-size:11px}.tag.off{background:#374151}.tag.early{background:#14532d}.tag.day{background:#075985}.tag.night{background:#4c1d95}.tag.leave{background:#881337}.tag.other{background:#713f12}.tag.swap{background:#164e63}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:12px 0}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px}.num{font-size:24px;font-weight:900}.label{font-size:12px;color:var(--muted)}
+    .list{display:grid;gap:8px}.row{display:grid;grid-template-columns:120px 1fr auto;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px}.hidden{display:none!important}.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin:12px 0}.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}.modalbox{max-width:520px;width:100%;background:#0f172a;border:1px solid var(--line);border-radius:18px;padding:16px}.modalbox textarea{width:100%;min-height:80px}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+    @media(max-width:700px){.wrap{padding:10px}.cell{min-height:76px;padding:6px;border-radius:10px}.shift{font-size:14px}.date{font-size:12px}.row{grid-template-columns:90px 1fr}.row button{grid-column:1/-1}.bar button,.bar input,.bar select{font-size:14px;padding:9px}.dow{font-size:11px}}
+  </style>
+</head>
+<body>
+<header><h1>Jessica Mazza Roster</h1><div class="sub" id="rangeText"></div></header>
+<main class="wrap">
+  <div class="bar">
+    <button id="prev">◀</button><button id="today" class="primary">Today</button><button id="next">▶</button>
+    <select id="view"><option value="month">Month</option><option value="week">Week</option><option value="list">List</option></select>
+    <input id="search" class="grow" placeholder="Search shift, date, BO, AL, EDO…">
+  </div>
+  <div class="cards" id="stats"></div>
+  <section id="calendar"></section>
+  <section class="panel"><b>Swaps / notes saved on this device</b><div class="small">Tap a day to add an actual shift, swap, or note. These save locally in this browser.</div><div id="swapList" class="list" style="margin-top:10px"></div></section>
+  <section class="panel"><b>TIL entries for Jessica</b><div id="tilList" class="list" style="margin-top:10px"></div></section>
+</main>
+<div id="modal" class="modal hidden"><div class="modalbox"><h3 id="modalTitle">Edit day</h3><label>Actual shift / swap</label><input id="actual" style="width:100%;margin:6px 0 10px"><label>Note</label><textarea id="note"></textarea><div class="actions"><button class="danger" id="deleteNote">Delete</button><button id="cancel">Cancel</button><button class="primary" id="saveNote">Save</button></div></div></div>
+<script src="data.js"></script>
+<script>
+const $=id=>document.getElementById(id); const dmap=Object.fromEntries(ROSTER.map(r=>[r.date,r]));
+let cursor=new Date(); let selected=null; let swaps=JSON.parse(localStorage.jessRosterSwaps||'{}');
+const fmt=new Intl.DateTimeFormat('en-AU',{weekday:'short',day:'numeric',month:'short'}); const longFmt=new Intl.DateTimeFormat('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function iso(d){return d.toISOString().slice(0,10)} function parse(s){let [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)} function add(d,n){let x=new Date(d);x.setDate(x.getDate()+n);return x}
+function shiftCat(s){s=(s||'').toUpperCase(); if(!s)return'blank'; if(['BO','RDO','EDO','ADO','OFF'].includes(s))return'off'; if(s.includes('AL')||s.includes('LEAVE'))return'leave'; let m=s.match(/^(\d{1,2}):(\d{2})/); if(m){let h=+m[1]; if(h<10)return'early'; if(h<16)return'day'; return'night'} return'other'}
+function displayShift(r){let sw=swaps[r.date]; return sw?.actual || r.shift || ''}
+function stats(rows){let counts={work:0,off:0,leave:0,early:0,day:0,night:0,weekend:0}; rows.forEach(r=>{let c=shiftCat(displayShift(r)); if(['early','day','night','other'].includes(c))counts.work++; if(c==='off')counts.off++; if(c==='leave')counts.leave++; if(c==='early')counts.early++; if(c==='day')counts.day++; if(c==='night')counts.night++; let dd=parse(r.date).getDay(); if(dd===0||dd===6)counts.weekend++});
+ $('stats').innerHTML=[['Work days',counts.work],['Off / EDO',counts.off],['Leave',counts.leave],['Early',counts.early],['Day',counts.day],['Night',counts.night],['Weekends',counts.weekend]].map(x=>`<div class="card"><div class="num">${x[1]}</div><div class="label">${x[0]}</div></div>`).join('')}
+function cell(date, inRange=true){let key=iso(date), r=dmap[key]||{date:key,shift:'',category:'blank'}, sw=swaps[key], shown=displayShift(r), c=shiftCat(shown), today=key===iso(new Date()); return `<div class="cell cat-${c} ${inRange?'':'dim'} ${today?'today':''}" onclick="openEdit('${key}')"><div class="date">${date.getDate()}</div><div class="small">${fmt.format(date).split(' ')[0]}</div><div class="shift">${shown||'—'}</div>${shown?`<span class="tag ${c}">${c}</span>`:''}${sw?'<span class="tag swap">note</span>':''}${sw?.note?`<div class="small">${escapeHtml(sw.note).slice(0,40)}</div>`:''}</div>`}
+function renderMonth(){let y=cursor.getFullYear(), m=cursor.getMonth(), first=new Date(y,m,1), start=add(first,-first.getDay()), last=new Date(y,m+1,0), rows=[]; for(let i=0;i<42;i++){let d=add(start,i); rows.push(cell(d,d.getMonth()===m))} $('rangeText').textContent=first.toLocaleString('en-AU',{month:'long',year:'numeric'}); $('calendar').innerHTML='<div class="grid">'+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="dow">${x}</div>`).join('')+rows.join('')+'</div>'; stats(ROSTER.filter(r=>{let d=parse(r.date);return d.getFullYear()===y&&d.getMonth()===m}))}
+function renderWeek(){let start=add(cursor,-cursor.getDay()); let days=Array.from({length:7},(_,i)=>add(start,i)); $('rangeText').textContent=`${longFmt.format(days[0])} – ${longFmt.format(days[6])}`; $('calendar').innerHTML='<div class="grid">'+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="dow">${x}</div>`).join('')+days.map(d=>cell(d,true)).join('')+'</div>'; stats(days.map(d=>dmap[iso(d)]||{date:iso(d),shift:''}))}
+function renderList(){let q=$('search').value.toLowerCase(); let rows=ROSTER.filter(r=>(r.date+' '+r.shift+' '+(swaps[r.date]?.actual||'')+' '+(swaps[r.date]?.note||'')).toLowerCase().includes(q)); $('rangeText').textContent=`${rows.length} matching roster entries`; $('calendar').innerHTML='<div class="list">'+rows.map(r=>`<div class="row"><b>${fmt.format(parse(r.date))}</b><span>${displayShift(r)||'—'} ${swaps[r.date]?.note?'<span class="small"> — '+escapeHtml(swaps[r.date].note)+'</span>':''}</span><button onclick="openEdit('${r.date}')">Edit</button></div>`).join('')+'</div>'; stats(rows)}
+function renderSwaps(){let keys=Object.keys(swaps).sort(); $('swapList').innerHTML=keys.length?keys.map(k=>`<div class="row"><b>${fmt.format(parse(k))}</b><span>${escapeHtml(swaps[k].actual||'')} ${escapeHtml(swaps[k].note||'')}</span><button onclick="openEdit('${k}')">Edit</button></div>`).join(''):'<div class="small">No swaps or notes yet.</div>'}
+function renderTil(){let list=TIL.slice().reverse().slice(0,30); $('tilList').innerHTML=list.length?list.map(t=>`<div class="row"><b>${fmt.format(parse(t.date))}</b><span>${escapeHtml(t.reason)}</span><strong>${t.hours>0?'+':''}${t.hours}</strong></div>`).join(''):'<div class="small">No TIL entries found.</div>'}
+function render(){let v=$('view').value; if(v==='month')renderMonth(); else if(v==='week')renderWeek(); else renderList(); renderSwaps(); renderTil()}
+function openEdit(key){selected=key; let r=dmap[key]||{shift:''}, sw=swaps[key]||{}; $('modalTitle').textContent=longFmt.format(parse(key))+' — roster '+(r.shift||'—'); $('actual').value=sw.actual||''; $('note').value=sw.note||''; $('modal').classList.remove('hidden')}
+function close(){ $('modal').classList.add('hidden')}
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+$('prev').onclick=()=>{let v=$('view').value; cursor=v==='week'?add(cursor,-7):new Date(cursor.getFullYear(),cursor.getMonth()-1,1); render()};
+$('next').onclick=()=>{let v=$('view').value; cursor=v==='week'?add(cursor,7):new Date(cursor.getFullYear(),cursor.getMonth()+1,1); render()};
+$('today').onclick=()=>{cursor=new Date(); render()}; $('view').onchange=render; $('search').oninput=()=>{if($('view').value!=='list')$('view').value='list'; render()};
+$('cancel').onclick=close; $('saveNote').onclick=()=>{let a=$('actual').value.trim(), n=$('note').value.trim(); if(a||n)swaps[selected]={actual:a,note:n}; else delete swaps[selected]; localStorage.jessRosterSwaps=JSON.stringify(swaps); close(); render()}; $('deleteNote').onclick=()=>{delete swaps[selected]; localStorage.jessRosterSwaps=JSON.stringify(swaps); close(); render()};
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{}); render();
+</script>
+</body></html>
