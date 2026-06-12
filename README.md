@@ -2,26 +2,21 @@
 
 Mobile-friendly GitHub Pages roster app.
 
+## Important
+
+This version uses the phone/computer device date automatically.
+Roster codes are unchanged.
+Roster runs to 31 Dec 2028.
+
 ## Upload to GitHub
 
-1. Create a new GitHub repository.
-2. Upload all files from this folder.
-3. Go to **Settings → Pages**.
-4. Source: **Deploy from a branch**.
-5. Branch: **main**.
-6. Folder: **/ root**.
-7. Save.
+1. Upload all files to your GitHub repo.
+2. Commit changes.
+3. Settings → Pages → Deploy from branch → main → / root.
 
 ## Install on phone
 
-### iPhone
-Open the GitHub Pages link in Safari → Share → Add to Home Screen.
+iPhone: open in Safari → Share → Add to Home Screen.
+Android: open in Chrome → menu → Install app.
 
-### Android
-Open the GitHub Pages link in Chrome → menu → Install app.
-
-## Notes
-
-- Roster codes are unchanged.
-- Dates use Australia/Melbourne.
-- Roster runs to 31 Dec 2028.
+If an old version is installed, delete the home-screen icon first, then open the GitHub link again.
